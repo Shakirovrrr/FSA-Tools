@@ -41,7 +41,7 @@ public class FSABuilder {
 		return this;
 	}
 
-	public FSABuildResult build(){
+	public FSABuildResult build() {
 		// TODO Implement builder
 		return null;
 	}
