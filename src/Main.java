@@ -9,5 +9,13 @@ public class Main {
 
 		FSABuilder builder = parser.constructBuilder();
 		System.out.println(builder);
+
+		FSABuildResult result = builder.build();
+		if (result.successful()) {
+			FiniteStateAutomata automata = result.getAutomata();
+			System.out.println(automata.isComplete());
+		} else {
+			System.out.println(result.getErrors());
+		}
 	}
 }

@@ -42,8 +42,23 @@ public class FSABuilder {
 	}
 
 	public FSABuildResult build() {
+		FiniteStateAutomata automata;
+		LinkedList<String> errors = new LinkedList<>();
+		boolean success = false;
+
+
+
 		// TODO Implement builder
 		return null;
+	}
+
+	private LinkedList<State> compileStates(){
+		LinkedList<State> result = new LinkedList<>();
+		for (String state : states) {
+			// TODO States compiler
+		}
+
+		return result;
 	}
 
 	private class Transition {
