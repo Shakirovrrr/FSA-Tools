@@ -3,7 +3,7 @@ import java.util.List;
 public class FSABuildResult {
 	private FiniteStateAutomata automata;
 	private List<FSAError> errors;
-	private boolean success;
+	private boolean success, complete;
 
 	public FSABuildResult(boolean success, List<FSAError> errors, FiniteStateAutomata automata) {
 		this.errors = errors;
@@ -13,6 +13,10 @@ public class FSABuildResult {
 
 	public boolean successful() {
 		return success;
+	}
+
+	public boolean isComplete() {
+		return complete;
 	}
 
 	public List<FSAError> getErrors() {

@@ -13,7 +13,7 @@ public class Main {
 		FSABuildResult result = builder.build();
 		if (result.successful()) {
 			FiniteStateAutomata automata = result.getAutomata();
-			System.out.println(automata.isComplete());
+			System.out.println(result.isComplete());
 		} else {
 			System.out.println(result.getErrors());
 		}
