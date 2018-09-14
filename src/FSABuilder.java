@@ -44,14 +44,12 @@ public class FSABuilder {
 	}
 
 	public FSABuildResult build() {
-		FiniteStateAutomata automata;
 		errors = new LinkedList<>();
-		boolean success = false;
 
 		// Check for E4
 		if (initialState == null) {
 			errors.add(FSABuildResult.FSAError.E4);
-			return new FSABuildResult(false, errors, null);
+			return failedBuild();
 		}
 
 		// Check for W1
@@ -59,10 +57,31 @@ public class FSABuilder {
 			errors.add(FSABuildResult.FSAError.W1);
 		}
 
+		FiniteStateAutomata automata = null;
+		LinkedList<State> compiled;
+		try {
+			compiled = compileTransitions();
+			automata = new FiniteStateAutomata(compiled, alphabet, stateCache.get(initialState));
+		} catch (FSAException e) {
+			switch (e.reason) {
+				case E1:
+				case E3:
+					errors.add(e.reason);
+					return failedBuild();
+				case W3:
+					// FIXME W3 as error
+					errors.add(FSABuildResult.FSAError.W3);
+					return failedBuild();
+			}
+		}
 
 		// TODO Implement builder
 
-		return null;
+		return new FSABuildResult(true, errors, automata);
+	}
+
+	private FSABuildResult failedBuild() {
+		return new FSABuildResult(false, errors, null);
 	}
 
 	private LinkedList<State> compileTransitions() throws FSAException {
@@ -84,7 +103,7 @@ public class FSABuilder {
 			State to = pickState(transition.to);
 
 			// Check for W3
-			if (from.getTransitions().containsKey(transition.name)){
+			if (from.getTransitions().containsKey(transition.name)) {
 				// FIXME Is it error?
 				throw new FSAException(FSABuildResult.FSAError.W3);
 			}

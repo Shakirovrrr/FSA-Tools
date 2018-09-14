@@ -65,8 +65,10 @@ public class FSAStreamParser {
 	}
 
 	private void parseInitialState(String initSt) {
-		String parsed = initSt.substring(9).split("[,}]")[0];
-		builder.setInitialState(parsed);
+		String[] parsed = initSt.substring(9).split("[,}]");
+		if (parsed.length > 0) {
+			builder.setInitialState(parsed[0]);
+		}
 	}
 
 	private void parseFinalStates(String finSt) {
