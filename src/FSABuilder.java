@@ -1,4 +1,5 @@
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,12 +49,11 @@ public class FSABuilder {
 
 		// Check for E4
 		if (initialState == null) {
-			errors.add(FSABuildResult.FSAError.E4);
-			return failedBuild();
+			return failedBuild(FSABuildResult.FSAError.E4);
 		}
 
 		// Check for W1
-		if (finalStates.size() == 0) {
+		if (finalStates.isEmpty()) {
 			errors.add(FSABuildResult.FSAError.W1);
 		}
 
@@ -66,21 +66,25 @@ public class FSABuilder {
 			switch (e.reason) {
 				case E1:
 				case E3:
-					errors.add(e.reason);
-					return failedBuild();
+					return failedBuild(e.reason);
 				case W3:
 					// FIXME W3 as error
-					errors.add(FSABuildResult.FSAError.W3);
-					return failedBuild();
+					return failedBuild(FSABuildResult.FSAError.W3);
 			}
 		}
 
-		// TODO Implement builder
+		// Check for E2 and W2
+		try {
+			checkInitialSpan();
+		} catch (FSAException e) {
+			return failedBuild(e.reason);
+		}
 
 		return new FSABuildResult(true, errors, automata);
 	}
 
-	private FSABuildResult failedBuild() {
+	private FSABuildResult failedBuild(FSABuildResult.FSAError error) {
+		errors.add(error);
 		return new FSABuildResult(false, errors, null);
 	}
 
@@ -126,6 +130,95 @@ public class FSABuilder {
 		}
 
 		return state;
+	}
+
+	private void checkInitialSpan() throws FSAException {
+		HashSet<State> spanSet = buildSpanSet();
+
+		if (spanSet.size() == states.size()) {
+			return;
+		}
+
+		errors.add(FSABuildResult.FSAError.W2);
+
+		HashSet<State> outsiders = findOutsiders(spanSet);
+
+		rescueOutsiders(outsiders, spanSet);
+		if (outsiders.size() > 0) {
+			throw new FSAException(FSABuildResult.FSAError.E2);
+		}
+	}
+
+	private HashSet<State> buildSpanSet() {
+		HashSet<State> spanSet = new HashSet<>();
+		HashSet<State> buffer = new HashSet<>();
+		LinkedList<State> bufferIn = new LinkedList<>();
+
+		buffer.add(stateCache.get(initialState));
+		while (buffer.size() > 0) {
+			for (State state : buffer) {
+				for (State value : state.getTransitions().values()) {
+					if (!buffer.contains(value) && !spanSet.contains(value)) {
+						bufferIn.add(value);
+					}
+				}
+				spanSet.add(state);
+			}
+			buffer.clear();
+			buffer.addAll(bufferIn);
+			bufferIn.clear();
+		}
+
+		return spanSet;
+	}
+
+	private HashSet<State> findOutsiders(HashSet<State> spanSet) {
+		HashSet<State> outsiders = new HashSet<>();
+		for (State state : stateCache.values()) {
+			if (!spanSet.contains(state)) {
+				outsiders.add(state);
+			}
+		}
+
+		return outsiders;
+	}
+
+	private void rescueOutsiders(HashSet<State> outsiders, HashSet<State> spanned) {
+		LinkedList<State> picked = new LinkedList<>();
+		for (State outsider : outsiders) {
+			if (hasTransitionToAny(outsider, spanned)) {
+				picked.add(outsider);
+			}
+		}
+		outsiders.removeAll(picked);
+
+		for (State state : picked) {
+			rescueFollowingOutsiders(state, outsiders);
+		}
+	}
+
+	private void rescueFollowingOutsiders(State rescued, HashSet<State> outsiders) {
+		LinkedList<State> picked = new LinkedList<>();
+		for (State outsider : outsiders) {
+			if (outsider.getTransitions().containsValue(rescued)) {
+				picked.add(outsider);
+			}
+		}
+		outsiders.removeAll(picked);
+
+		for (State state : picked) {
+			rescueFollowingOutsiders(state, outsiders);
+		}
+	}
+
+	private boolean hasTransitionToAny(State who, HashSet<State> where) {
+		for (State state : who.getTransitions().values()) {
+			if (where.contains(state)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private class Transition {

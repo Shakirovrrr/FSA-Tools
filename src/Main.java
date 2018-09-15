@@ -12,10 +12,11 @@ public class Main {
 
 		FSABuildResult result = builder.build();
 		if (result.successful()) {
-			FiniteStateAutomata automata = result.getAutomata();
-			printList(result.getErrors());
+			System.out.println("Success");
 			System.out.println(result.isComplete());
+			printList(result.getErrors());
 		} else {
+			System.out.println("Error");
 			printList(result.getErrors());
 		}
 	}
