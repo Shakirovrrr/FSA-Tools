@@ -1,5 +1,7 @@
 import java.io.InputStream;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FSAStreamParser {
 	private InputStream stream;
@@ -29,11 +31,16 @@ public class FSAStreamParser {
 			throw new IllegalStateException("Wile was not read yet.");
 		}
 
-		parseStates(states);
-		parseAlphabet(alphabet);
-		parseInitialState(initSt);
-		parseFinalStates(finSt);
-		parseTransitions(trans);
+		/* Use exception catching
+		to stop further parsing */
+		try {
+			parseStates(states);
+			parseAlphabet(alphabet);
+			parseInitialState(initSt);
+			parseFinalStates(finSt);
+			parseTransitions(trans);
+		} catch (MalformedInputException ignored) {
+		}
 
 		parseComplete = true;
 	}
@@ -50,39 +57,63 @@ public class FSAStreamParser {
 		readComplete = true;
 	}
 
-	private void parseStates(String states) {
+	private void parseStates(String states) throws MalformedInputException {
+		//language=RegExp
+		validateFormat("states=\\{[A-z,]*}", states);
 		String[] parsed = states.substring(8).split("[,}]");
 		for (String state : parsed) {
 			builder.addState(state);
 		}
 	}
 
-	private void parseAlphabet(String alphabet) {
+	private void parseAlphabet(String alphabet) throws MalformedInputException {
+		//language=RegExp
+		validateFormat("alpha=\\{[A-z,]*}", alphabet);
 		String[] parsed = alphabet.substring(7).split("[,}]");
 		for (String alpha : parsed) {
 			builder.addAlpha(alpha);
 		}
 	}
 
-	private void parseInitialState(String initSt) {
+	private void parseInitialState(String initSt) throws MalformedInputException {
+		//language=RegExp
+		validateFormat("init\\.st=\\{[A-z]*}", initSt);
 		String[] parsed = initSt.substring(9).split("[,}]");
 		if (parsed.length > 0) {
 			builder.setInitialState(parsed[0]);
 		}
 	}
 
-	private void parseFinalStates(String finSt) {
+	private void parseFinalStates(String finSt) throws MalformedInputException {
+		//language=RegExp
+		validateFormat("fin\\.st=\\{[A-z,]*}", finSt);
 		String[] parsed = finSt.substring(8).split("[,}]");
 		for (String state : parsed) {
 			builder.addFinalState(state);
 		}
 	}
 
-	private void parseTransitions(String trans) {
+	private void parseTransitions(String trans) throws MalformedInputException {
+		//language=RegExp
+		validateFormat("trans=\\{[A-z,>]*}", trans);
 		String[] parsed = trans.substring(7).split("[,}]");
 		for (String transition : parsed) {
 			String[] t = transition.split(">");
 			builder.addTransition(t[1], t[0], t[2]);
+		}
+	}
+
+	private void validateFormat(String regex, String input) throws MalformedInputException {
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(input);
+		if (!matcher.matches()) {
+			builder.invalidateInputFile();
+			throw new MalformedInputException();
+		}
+	}
+
+	private class MalformedInputException extends Exception {
+		MalformedInputException() {
 		}
 	}
 }

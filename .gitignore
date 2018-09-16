@@ -26,5 +26,6 @@ hs_err_pid*
 .idea/
 *.iml
 
-# Input files
+# I/O files
 fsa.txt
+result.txt

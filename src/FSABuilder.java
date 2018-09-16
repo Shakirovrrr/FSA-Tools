@@ -9,7 +9,9 @@ public class FSABuilder {
 	private List<String> finalStates;
 	private String initialState;
 
-	private List<FSABuildResult.FSAError> errors;
+	private boolean malformedInput;
+
+	private List<FSABuildResult.FSAError> warnings;
 	private HashMap<String, State> stateCache;
 
 	public FSABuilder() {
@@ -17,6 +19,7 @@ public class FSABuilder {
 		alphabet = new LinkedList<>();
 		transitions = new LinkedList<>();
 		finalStates = new LinkedList<>();
+		malformedInput = false;
 	}
 
 	public FSABuilder addState(String name) {
@@ -44,32 +47,39 @@ public class FSABuilder {
 		return this;
 	}
 
+	public FSABuilder invalidateInputFile() {
+		malformedInput = true;
+		return this;
+	}
+
 	public FSABuildResult build() {
-		errors = new LinkedList<>();
+		if (malformedInput) {
+			return new FSABuildResult(FSABuildResult.FSAError.E5);
+		}
+
+		warnings = new LinkedList<>();
 
 		// Check for E4
 		if (initialState == null) {
-			return failedBuild(FSABuildResult.FSAError.E4);
+			return new FSABuildResult(FSABuildResult.FSAError.E4);
 		}
 
 		// Check for W1
 		if (finalStates.isEmpty()) {
-			errors.add(FSABuildResult.FSAError.W1);
+			warnings.add(FSABuildResult.FSAError.W1);
 		}
 
-		FiniteStateAutomata automata = null;
-		LinkedList<State> compiled;
+		LinkedList<State> compiled = null;
 		try {
 			compiled = compileTransitions();
-			automata = new FiniteStateAutomata(compiled, alphabet, stateCache.get(initialState));
 		} catch (FSAException e) {
 			switch (e.reason) {
 				case E1:
 				case E3:
-					return failedBuild(e.reason);
+					return new FSABuildResult(e.reason);
 				case W3:
 					// FIXME W3 as error
-					return failedBuild(FSABuildResult.FSAError.W3);
+					return new FSABuildResult(e.reason);
 			}
 		}
 
@@ -77,15 +87,15 @@ public class FSABuilder {
 		try {
 			checkInitialSpan();
 		} catch (FSAException e) {
-			return failedBuild(e.reason);
+			return new FSABuildResult(e.reason);
 		}
 
-		return new FSABuildResult(true, errors, automata);
-	}
+		// Check completeness
+		boolean complete = checkCompleteness();
 
-	private FSABuildResult failedBuild(FSABuildResult.FSAError error) {
-		errors.add(error);
-		return new FSABuildResult(false, errors, null);
+		FiniteStateAutomata automata =
+				new FiniteStateAutomata(compiled, alphabet, stateCache.get(initialState));
+		return new FSABuildResult(true, warnings, automata, complete);
 	}
 
 	private LinkedList<State> compileTransitions() throws FSAException {
@@ -139,7 +149,7 @@ public class FSABuilder {
 			return;
 		}
 
-		errors.add(FSABuildResult.FSAError.W2);
+		warnings.add(FSABuildResult.FSAError.W2);
 
 		HashSet<State> outsiders = findOutsiders(spanSet);
 
@@ -219,6 +229,18 @@ public class FSABuilder {
 		}
 
 		return false;
+	}
+
+	private boolean checkCompleteness() {
+		for (State state : stateCache.values()) {
+			for (String alpha : alphabet) {
+				if (!state.getTransitions().containsKey(alpha)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	private class Transition {
