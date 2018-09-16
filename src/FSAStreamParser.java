@@ -1,7 +1,5 @@
 import java.io.InputStream;
 import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FSAStreamParser {
 	private InputStream stream;
@@ -104,9 +102,7 @@ public class FSAStreamParser {
 	}
 
 	private void validateFormat(String regex, String input) throws MalformedInputException {
-		Pattern pattern = Pattern.compile(regex);
-		Matcher matcher = pattern.matcher(input);
-		if (!matcher.matches()) {
+		if (!input.matches(regex)) {
 			builder.invalidateInputFile();
 			throw new MalformedInputException();
 		}

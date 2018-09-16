@@ -77,14 +77,12 @@ public class FSABuilder {
 				case E1:
 				case E3:
 					return new FSABuildResult(e.reason);
-				case W3:
-					// FIXME W3 as error
-					return new FSABuildResult(e.reason);
 			}
 		}
 
 		// Check for E2 and W2
 		try {
+			// FIXME W2 for nondeterministic
 			checkInitialSpan();
 		} catch (FSAException e) {
 			return new FSABuildResult(e.reason);
@@ -109,7 +107,7 @@ public class FSABuilder {
 			}
 
 			// Check for E3
-			if (!alphabet.contains(transition.name)) {
+			if (!alphabet.contains(transition.alpha)) {
 				throw new FSAException(FSABuildResult.FSAError.E3);
 			}
 
@@ -117,11 +115,12 @@ public class FSABuilder {
 			State to = pickState(transition.to);
 
 			// Check for W3
-			if (from.getTransitions().containsKey(transition.name)) {
-				// FIXME Is it error?
-				throw new FSAException(FSABuildResult.FSAError.W3);
+			if (from.getTransitions().containsKey(transition.alpha) &&
+					!from.getTransitions().get(transition.alpha).equals(to)) {
+				warnings.add(FSABuildResult.FSAError.W3);
+				addRedundantTransition(from, transition.alpha, to);
 			}
-			from.getTransitions().put(transition.name, to);
+			from.getTransitions().put(transition.alpha, to);
 		}
 
 		return new LinkedList<>(stateCache.values());
@@ -140,6 +139,14 @@ public class FSABuilder {
 		}
 
 		return state;
+	}
+
+	private void addRedundantTransition(State state, String transition, State to) {
+		if (state.getTransitions().containsKey(transition)) {
+			addRedundantTransition(state, transition + '.', to);
+		} else {
+			state.getTransitions().put(transition, to);
+		}
 	}
 
 	private void checkInitialSpan() throws FSAException {
@@ -244,10 +251,10 @@ public class FSABuilder {
 	}
 
 	private class Transition {
-		String name, from, to;
+		String alpha, from, to;
 
-		Transition(String name, String form, String to) {
-			this.name = name;
+		Transition(String alpha, String form, String to) {
+			this.alpha = alpha;
 			this.from = form;
 			this.to = to;
 		}
