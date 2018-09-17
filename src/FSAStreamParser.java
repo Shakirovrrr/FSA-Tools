@@ -37,7 +37,8 @@ public class FSAStreamParser {
 			parseInitialState(initSt);
 			parseFinalStates(finSt);
 			parseTransitions(trans);
-		} catch (MalformedInputException ignored) {
+		} catch (MalformedInputException e) {
+			builder.invalidateInputFile();
 		}
 
 		parseComplete = true;
@@ -103,7 +104,6 @@ public class FSAStreamParser {
 
 	private void validateFormat(String regex, String input) throws MalformedInputException {
 		if (!input.matches(regex)) {
-			builder.invalidateInputFile();
 			throw new MalformedInputException();
 		}
 	}
