@@ -16,10 +16,10 @@ public class Main {
 		PrintStream printer = new PrintStream(new FileOutputStream("result.txt"));
 		if (result.successful()) {
 			printer.print("FSA is ");
-			printer.println(result.isComplete() ? "complete" : "incomplete");
-			printErrors(result.getErrors(), printer);
+			printer.print(result.isComplete() ? "complete" : "incomplete");
+			printErrors(result, printer, "\n");
 		} else {
-			printErrors(result.getErrors(), printer);
+			printErrors(result, printer, "");
 		}
 		printer.close();
 	}
@@ -31,45 +31,45 @@ public class Main {
 		System.out.println();
 	}
 
-	private static void printErrors(Collection<FSABuildResult.FSAError> errors, PrintStream printStream) {
-		for (FSABuildResult.FSAError error : errors) {
-			printError(error, printStream);
+	private static void printErrors(FSABuildResult buildResult, PrintStream printStream, String prefix) {
+		for (FSABuildResult.FSAError error : buildResult.getErrors()) {
+			printError(error, printStream, prefix, buildResult.getNotRepresented());
 		}
 	}
 
-	private static void printError(FSABuildResult.FSAError error, PrintStream printer) {
+	private static void printError(FSABuildResult.FSAError error, PrintStream printer, String prefix, String notRepresented) {
 		switch (error) {
 			case E1:
-				printer.println("Error:");
-				printer.println("E1: A state s is not in set of states");
+				printer.println(prefix + "Error:");
+				printer.printf("E1: A state \'%s\' is not in set of states", notRepresented);
 				break;
 			case E2:
-				printer.println("Error:");
-				printer.println("E2: Some states are disjoint");
+				printer.println(prefix + "Error:");
+				printer.print("E2: Some states are disjoint");
 				break;
 			case E3:
-				printer.println("Error:");
-				printer.println("E3: A transition a is not represented in the alphabet");
+				printer.println(prefix + "Error:");
+				printer.printf("E3: A transition \'%s\' is not represented in the alphabet", notRepresented);
 				break;
 			case E4:
-				printer.println("Error:");
-				printer.println("E4: Initial state is not defined");
+				printer.println(prefix + "Error:");
+				printer.print("E4: Initial state is not defined");
 				break;
 			case E5:
-				printer.println("Error:");
-				printer.println("E5: Input file is malformed");
+				printer.println(prefix + "Error:");
+				printer.print("E5: Input file is malformed");
 				break;
 			case W1:
-				printer.println("Warning:");
-				printer.println("W1: Accepting state is not defined");
+				printer.println(prefix + "Warning:");
+				printer.print("W1: Accepting state is not defined");
 				break;
 			case W2:
-				printer.println("Warning:");
-				printer.println("W2: Some states are not reachable from initial state");
+				printer.println(prefix + "Warning:");
+				printer.print("W2: Some states are not reachable from initial state");
 				break;
 			case W3:
-				printer.println("Warning:");
-				printer.println("W3: FSA is nondeterministic");
+				printer.println(prefix + "Warning:");
+				printer.print("W3: FSA is nondeterministic");
 				break;
 		}
 	}

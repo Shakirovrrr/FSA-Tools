@@ -5,6 +5,7 @@ public class FSABuildResult {
 	private FiniteStateAutomata automata;
 	private List<FSAError> errors;
 	private boolean success, complete;
+	private String notRepresentedE15;
 
 	public FSABuildResult(boolean success, List<FSAError> errors, FiniteStateAutomata automata, boolean complete) {
 		this.errors = errors;
@@ -20,6 +21,14 @@ public class FSABuildResult {
 		errors.add(error);
 	}
 
+	public FSABuildResult(FSAError error, String notRepresentedE15) {
+		success = false;
+		automata = null;
+		errors = new LinkedList<>();
+		errors.add(error);
+		this.notRepresentedE15 = notRepresentedE15;
+	}
+
 	public boolean successful() {
 		return success;
 	}
@@ -30,6 +39,10 @@ public class FSABuildResult {
 
 	public List<FSAError> getErrors() {
 		return errors;
+	}
+
+	public String getNotRepresented() {
+		return notRepresentedE15;
 	}
 
 	public FiniteStateAutomata getAutomata() {

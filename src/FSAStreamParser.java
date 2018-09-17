@@ -57,7 +57,7 @@ public class FSAStreamParser {
 
 	private void parseStates(String states) throws MalformedInputException {
 		//language=RegExp
-		validateFormat("states=\\{[A-z,]*}", states);
+		validateFormat("states=\\{[A-z0-9,]*}", states);
 		String[] parsed = states.substring(8).split("[,}]");
 		for (String state : parsed) {
 			builder.addState(state);
@@ -66,7 +66,7 @@ public class FSAStreamParser {
 
 	private void parseAlphabet(String alphabet) throws MalformedInputException {
 		//language=RegExp
-		validateFormat("alpha=\\{[A-z,]*}", alphabet);
+		validateFormat("alpha=\\{[A-z0-9,_]*}", alphabet);
 		String[] parsed = alphabet.substring(7).split("[,}]");
 		for (String alpha : parsed) {
 			builder.addAlpha(alpha);
@@ -75,7 +75,7 @@ public class FSAStreamParser {
 
 	private void parseInitialState(String initSt) throws MalformedInputException {
 		//language=RegExp
-		validateFormat("init\\.st=\\{[A-z]*}", initSt);
+		validateFormat("init\\.st=\\{[A-z0-9]*}", initSt);
 		String[] parsed = initSt.substring(9).split("[,}]");
 		if (parsed.length > 0) {
 			builder.setInitialState(parsed[0]);
@@ -84,7 +84,7 @@ public class FSAStreamParser {
 
 	private void parseFinalStates(String finSt) throws MalformedInputException {
 		//language=RegExp
-		validateFormat("fin\\.st=\\{[A-z,]*}", finSt);
+		validateFormat("fin\\.st=\\{[A-z0-9,]*}", finSt);
 		String[] parsed = finSt.substring(8).split("[,}]");
 		for (String state : parsed) {
 			builder.addFinalState(state);
@@ -93,7 +93,7 @@ public class FSAStreamParser {
 
 	private void parseTransitions(String trans) throws MalformedInputException {
 		//language=RegExp
-		validateFormat("trans=\\{[A-z,>]*}", trans);
+		validateFormat("trans=\\{[A-z0-9,>_]*}", trans);
 		String[] parsed = trans.substring(7).split("[,}]");
 		for (String transition : parsed) {
 			String[] t = transition.split(">");

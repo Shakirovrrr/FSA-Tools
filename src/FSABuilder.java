@@ -76,7 +76,7 @@ public class FSABuilder {
 			switch (e.reason) {
 				case E1:
 				case E3:
-					return new FSABuildResult(e.reason);
+					return new FSABuildResult(e.reason, e.notRepresented);
 			}
 		}
 
@@ -100,14 +100,15 @@ public class FSABuilder {
 
 		for (Transition transition : transitions) {
 			// Check for E1
-			if (!states.contains(transition.from) ||
-					!states.contains(transition.to)) {
-				throw new FSAException(FSABuildResult.FSAError.E1);
+			if (!states.contains(transition.from)) {
+				throw new FSAException(FSABuildResult.FSAError.E1, transition.from);
+			} else if (!states.contains(transition.to)) {
+				throw new FSAException(FSABuildResult.FSAError.E1, transition.to);
 			}
 
 			// Check for E3
 			if (!alphabet.contains(transition.alpha)) {
-				throw new FSAException(FSABuildResult.FSAError.E3);
+				throw new FSAException(FSABuildResult.FSAError.E3, transition.alpha);
 			}
 
 			State from = pickState(transition.from);
@@ -262,9 +263,15 @@ public class FSABuilder {
 
 	private class FSAException extends Exception {
 		FSABuildResult.FSAError reason;
+		String notRepresented;
 
 		FSAException(FSABuildResult.FSAError reason) {
 			this.reason = reason;
+		}
+
+		FSAException(FSABuildResult.FSAError reason, String notRepresented) {
+			this.reason = reason;
+			this.notRepresented = notRepresented;
 		}
 	}
 }
