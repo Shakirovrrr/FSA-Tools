@@ -2,7 +2,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.Collection;
 
 public class Main {
 	public static void main(String[] args) throws FileNotFoundException {
@@ -22,13 +21,6 @@ public class Main {
 			printErrors(result, printer, "");
 		}
 		printer.close();
-	}
-
-	private static void printList(Collection list) {
-		for (Object o : list) {
-			System.out.print(o + " ");
-		}
-		System.out.println();
 	}
 
 	private static void printErrors(FSABuildResult buildResult, PrintStream printStream, String prefix) {
