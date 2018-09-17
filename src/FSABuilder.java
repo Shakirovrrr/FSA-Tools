@@ -69,15 +69,12 @@ public class FSABuilder {
 			warnings.add(FSABuildResult.FSAError.W1);
 		}
 
-		LinkedList<State> compiled = null;
+		LinkedList<State> compiled;
+		// Compile and check for E1 and E3
 		try {
 			compiled = compileTransitions();
 		} catch (FSAException e) {
-			switch (e.reason) {
-				case E1:
-				case E3:
-					return new FSABuildResult(e.reason, e.notRepresented);
-			}
+			return new FSABuildResult(e.reason, e.notRepresented);
 		}
 
 		// Check for E2 and W2
