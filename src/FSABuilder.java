@@ -82,7 +82,6 @@ public class FSABuilder {
 
 		// Check for E2 and W2
 		try {
-			// FIXME W2 for nondeterministic
 			checkInitialSpan();
 		} catch (FSAException e) {
 			return new FSABuildResult(e.reason);
@@ -119,8 +118,9 @@ public class FSABuilder {
 					!from.getTransitions().get(transition.alpha).equals(to)) {
 				warnings.add(FSABuildResult.FSAError.W3);
 				addRedundantTransition(from, transition.alpha, to);
+			} else {
+				from.getTransitions().put(transition.alpha, to);
 			}
-			from.getTransitions().put(transition.alpha, to);
 		}
 
 		return new LinkedList<>(stateCache.values());
