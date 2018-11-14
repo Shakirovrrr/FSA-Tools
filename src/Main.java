@@ -14,12 +14,9 @@ public class Main {
 
 		FSABuildResult result = builder.build();
 		PrintStream printer = new PrintStream(new FileOutputStream("result.txt"));
-		if (result.successful()) {
-			printer.print("FSA is ");
-			printer.print(result.isComplete() ? "complete" : "incomplete");
-			if (!result.getErrors().isEmpty()) {
-				printWarnings(result.getErrors(), printer);
-			}
+		if (result.successful() && !result.getErrors().contains(FSABuildResult.FSAError.W3)) {
+			FSARegexMaker regexMaker = new FSARegexMaker(result.getAutomata());
+			printer.print(regexMaker.makeRegex());
 		} else {
 			printErrors(result, printer);
 		}
@@ -50,6 +47,9 @@ public class Main {
 			case E5:
 				printer.print("E5: Input file is malformed");
 				break;
+			case W3:
+				printer.print("\nE6: FSA is nondeterministic");
+				break;
 		}
 	}
 
@@ -62,9 +62,6 @@ public class Main {
 					break;
 				case W2:
 					printer.print("\nW2: Some states are not reachable from initial state");
-					break;
-				case W3:
-					printer.print("\nW3: FSA is nondeterministic");
 					break;
 			}
 		}

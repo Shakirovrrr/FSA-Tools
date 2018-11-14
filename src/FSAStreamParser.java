@@ -24,7 +24,7 @@ public class FSAStreamParser {
 		return builder;
 	}
 
-	public void parse() {
+	public boolean parse() {
 		if (!readComplete) {
 			throw new IllegalStateException("Wile was not read yet.");
 		}
@@ -42,9 +42,11 @@ public class FSAStreamParser {
 		}
 
 		parseComplete = true;
+
+		return parseComplete;
 	}
 
-	public void read() {
+	public boolean read() {
 		Scanner scanner = new Scanner(stream);
 		states = scanner.nextLine();
 		alphabet = scanner.nextLine();
@@ -54,6 +56,8 @@ public class FSAStreamParser {
 		scanner.close();
 
 		readComplete = true;
+
+		return readComplete;
 	}
 
 	private void parseStates(String states) throws MalformedInputException {
