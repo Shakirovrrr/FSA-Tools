@@ -3,7 +3,7 @@ import java.util.List;
 
 public class FSARegexMaker {
 	private FiniteStateAutomata automata;
-	private List<State> states;
+	private List<FSAState> states;
 
 	public FSARegexMaker(FiniteStateAutomata automata) {
 		this.automata = automata;
@@ -41,9 +41,10 @@ public class FSARegexMaker {
 
 	private StringBuilder initialUpdateRule(int i, int j) {
 		StringBuilder builder = new StringBuilder();
-		if (i == j) {
-			
-		}
+
+
+
+		return builder;
 	}
 
 	private boolean updateRuleAssert(int k, int i, int j) {

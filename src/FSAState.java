@@ -1,11 +1,11 @@
 import java.util.Map;
 
-public class State {
+public class FSAState {
 	private String name;
-	private Map<String, State> transitions;
+	private Map<String, FSAState> transitions;
 	private boolean isFinal;
 
-	public State(String name, boolean isFinal, Map<String, State> transitions) {
+	public FSAState(String name, boolean isFinal, Map<String, FSAState> transitions) {
 		this.name = name;
 		this.isFinal = isFinal;
 		this.transitions = transitions;
@@ -15,7 +15,8 @@ public class State {
 		return name;
 	}
 
-	public Map<String, State> getTransitions() {
+	@Deprecated
+	public Map<String, FSAState> getTransitions() {
 		return transitions;
 	}
 

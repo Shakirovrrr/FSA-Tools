@@ -2,22 +2,24 @@ import java.util.Collection;
 import java.util.HashSet;
 
 public class FiniteStateAutomata {
-	private Collection<State> states;
+	private Collection<FSAState> states;
 	private Collection<String> alphabet;
-	private State initialState;
-	private Collection<State> finalStates;
+	private FSAState initialState;
+	private Collection<FSAState> finalStates;
+	private Collection<FSATransition> transitions;
 
 	private boolean finalStatesCollected;
 
-	public FiniteStateAutomata(Collection<State> states, Collection<String> alphabet, State initialState) {
+	public FiniteStateAutomata(Collection<FSAState> states, Collection<FSATransition> transitions, Collection<String> alphabet, FSAState initialState) {
 		this.states = states;
 		this.alphabet = alphabet;
 		this.initialState = initialState;
+		this.transitions = transitions;
 
 		finalStatesCollected = false;
 	}
 
-	public Collection<State> getStates() {
+	public Collection<FSAState> getStates() {
 		return states;
 	}
 
@@ -25,11 +27,15 @@ public class FiniteStateAutomata {
 		return alphabet;
 	}
 
-	public State getInitialState() {
+	public FSAState getInitialState() {
 		return initialState;
 	}
 
-	public Collection<State> getFinalStates() {
+	public Collection<FSATransition> getTransitions() {
+		return transitions;
+	}
+
+	public Collection<FSAState> getFinalStates() {
 		if (!finalStatesCollected) {
 			collectFinalStates();
 		}
@@ -42,7 +48,7 @@ public class FiniteStateAutomata {
 
 	private void collectFinalStates() {
 		finalStates = new HashSet<>();
-		for (State state : states) {
+		for (FSAState state : states) {
 			if (state.isFinal()) {
 				finalStates.add(state);
 			}

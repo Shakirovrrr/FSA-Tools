@@ -12,7 +12,7 @@ public class FSABuilder {
 	private boolean malformedInput;
 
 	private List<FSABuildResult.FSAError> warnings;
-	private HashMap<String, State> stateCache;
+	private HashMap<String, FSAState> stateCache;
 
 	public FSABuilder() {
 		states = new LinkedList<>();
@@ -69,7 +69,7 @@ public class FSABuilder {
 			warnings.add(FSABuildResult.FSAError.W1);
 		}
 
-		LinkedList<State> compiled;
+		LinkedList<FSAState> compiled;
 		// Compile and check for E1 and E3
 		try {
 			compiled = compileTransitions();
@@ -92,7 +92,7 @@ public class FSABuilder {
 		return new FSABuildResult(true, warnings, automata, complete);
 	}
 
-	private LinkedList<State> compileTransitions() throws FSAException {
+	private LinkedList<FSAState> compileTransitions() throws FSAException {
 		stateCache = new HashMap<>();
 
 		for (Transition transition : transitions) {
@@ -108,8 +108,8 @@ public class FSABuilder {
 				throw new FSAException(FSABuildResult.FSAError.E3, transition.alpha);
 			}
 
-			State from = pickState(transition.from);
-			State to = pickState(transition.to);
+			FSAState from = pickState(transition.from);
+			FSAState to = pickState(transition.to);
 
 			// Check for W3
 			if (from.getTransitions().containsKey(transition.alpha) &&
@@ -124,14 +124,14 @@ public class FSABuilder {
 		return new LinkedList<>(stateCache.values());
 	}
 
-	private State pickState(String name) {
-		State state;
+	private FSAState pickState(String name) {
+		FSAState state;
 
 		if (stateCache.containsKey(name)) {
 			state = stateCache.get(name);
 		} else {
 			boolean isFinal = finalStates.contains(name);
-			state = new State(name, isFinal, new HashMap<>());
+			state = new FSAState(name, isFinal, new HashMap<>());
 
 			stateCache.put(name, state);
 		}
@@ -139,7 +139,7 @@ public class FSABuilder {
 		return state;
 	}
 
-	private void addRedundantTransition(State state, String transition, State to) {
+	private void addRedundantTransition(FSAState state, String transition, FSAState to) {
 		if (state.getTransitions().containsKey(transition)) {
 			addRedundantTransition(state, transition + '.', to);
 		} else {
@@ -148,7 +148,7 @@ public class FSABuilder {
 	}
 
 	private void checkInitialSpan() throws FSAException {
-		HashSet<State> spanSet = buildSpanSet();
+		HashSet<FSAState> spanSet = buildSpanSet();
 
 		if (spanSet.size() == states.size()) {
 			return;
@@ -156,7 +156,7 @@ public class FSABuilder {
 
 		warnings.add(FSABuildResult.FSAError.W2);
 
-		HashSet<State> outsiders = findOutsiders(spanSet);
+		HashSet<FSAState> outsiders = findOutsiders(spanSet);
 
 		rescueOutsiders(outsiders, spanSet);
 		if (outsiders.size() > 0) {
@@ -164,15 +164,15 @@ public class FSABuilder {
 		}
 	}
 
-	private HashSet<State> buildSpanSet() {
-		HashSet<State> spanSet = new HashSet<>();
-		HashSet<State> buffer = new HashSet<>();
-		LinkedList<State> bufferIn = new LinkedList<>();
+	private HashSet<FSAState> buildSpanSet() {
+		HashSet<FSAState> spanSet = new HashSet<>();
+		HashSet<FSAState> buffer = new HashSet<>();
+		LinkedList<FSAState> bufferIn = new LinkedList<>();
 
 		buffer.add(stateCache.get(initialState));
 		while (buffer.size() > 0) {
-			for (State state : buffer) {
-				for (State value : state.getTransitions().values()) {
+			for (FSAState state : buffer) {
+				for (FSAState value : state.getTransitions().values()) {
 					if (!buffer.contains(value) && !spanSet.contains(value)) {
 						bufferIn.add(value);
 					}
@@ -187,9 +187,9 @@ public class FSABuilder {
 		return spanSet;
 	}
 
-	private HashSet<State> findOutsiders(HashSet<State> spanSet) {
-		HashSet<State> outsiders = new HashSet<>();
-		for (State state : stateCache.values()) {
+	private HashSet<FSAState> findOutsiders(HashSet<FSAState> spanSet) {
+		HashSet<FSAState> outsiders = new HashSet<>();
+		for (FSAState state : stateCache.values()) {
 			if (!spanSet.contains(state)) {
 				outsiders.add(state);
 			}
@@ -198,36 +198,36 @@ public class FSABuilder {
 		return outsiders;
 	}
 
-	private void rescueOutsiders(HashSet<State> outsiders, HashSet<State> spanned) {
-		LinkedList<State> picked = new LinkedList<>();
-		for (State outsider : outsiders) {
+	private void rescueOutsiders(HashSet<FSAState> outsiders, HashSet<FSAState> spanned) {
+		LinkedList<FSAState> picked = new LinkedList<>();
+		for (FSAState outsider : outsiders) {
 			if (hasTransitionToAny(outsider, spanned)) {
 				picked.add(outsider);
 			}
 		}
 		outsiders.removeAll(picked);
 
-		for (State state : picked) {
+		for (FSAState state : picked) {
 			rescueFollowingOutsiders(state, outsiders);
 		}
 	}
 
-	private void rescueFollowingOutsiders(State rescued, HashSet<State> outsiders) {
-		LinkedList<State> picked = new LinkedList<>();
-		for (State outsider : outsiders) {
+	private void rescueFollowingOutsiders(FSAState rescued, HashSet<FSAState> outsiders) {
+		LinkedList<FSAState> picked = new LinkedList<>();
+		for (FSAState outsider : outsiders) {
 			if (outsider.getTransitions().containsValue(rescued)) {
 				picked.add(outsider);
 			}
 		}
 		outsiders.removeAll(picked);
 
-		for (State state : picked) {
+		for (FSAState state : picked) {
 			rescueFollowingOutsiders(state, outsiders);
 		}
 	}
 
-	private boolean hasTransitionToAny(State who, HashSet<State> where) {
-		for (State state : who.getTransitions().values()) {
+	private boolean hasTransitionToAny(FSAState who, HashSet<FSAState> where) {
+		for (FSAState state : who.getTransitions().values()) {
 			if (where.contains(state)) {
 				return true;
 			}
@@ -237,7 +237,7 @@ public class FSABuilder {
 	}
 
 	private boolean checkCompleteness() {
-		for (State state : stateCache.values()) {
+		for (FSAState state : stateCache.values()) {
 			for (String alpha : alphabet) {
 				if (!state.getTransitions().containsKey(alpha)) {
 					return false;
