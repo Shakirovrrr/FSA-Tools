@@ -2,7 +2,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.Collection;
 
 public class Main {
 	public static void main(String[] args) throws FileNotFoundException {
