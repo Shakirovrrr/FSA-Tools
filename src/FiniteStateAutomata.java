@@ -6,15 +6,13 @@ public class FiniteStateAutomata {
 	private Collection<String> alphabet;
 	private FSAState initialState;
 	private Collection<FSAState> finalStates;
-	private Collection<FSATransition> transitions;
 
 	private boolean finalStatesCollected;
 
-	public FiniteStateAutomata(Collection<FSAState> states, Collection<FSATransition> transitions, Collection<String> alphabet, FSAState initialState) {
+	public FiniteStateAutomata(Collection<FSAState> states, Collection<String> alphabet, FSAState initialState) {
 		this.states = states;
 		this.alphabet = alphabet;
 		this.initialState = initialState;
-		this.transitions = transitions;
 
 		finalStatesCollected = false;
 	}
@@ -29,10 +27,6 @@ public class FiniteStateAutomata {
 
 	public FSAState getInitialState() {
 		return initialState;
-	}
-
-	public Collection<FSATransition> getTransitions() {
-		return transitions;
 	}
 
 	public Collection<FSAState> getFinalStates() {

@@ -15,7 +15,6 @@ public class FSAState {
 		return name;
 	}
 
-	@Deprecated
 	public Map<String, FSAState> getTransitions() {
 		return transitions;
 	}
