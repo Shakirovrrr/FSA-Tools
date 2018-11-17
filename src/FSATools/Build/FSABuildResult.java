@@ -1,17 +1,20 @@
+package FSATools.Build;
+
+import FSATools.Foundation.FiniteStateAutomata;
+
 import java.util.LinkedList;
 import java.util.List;
 
 public class FSABuildResult {
 	private FiniteStateAutomata automata;
 	private List<FSAError> errors;
-	private boolean success, complete;
+	private boolean success;
 	private String notRepresentedE15;
 
-	public FSABuildResult(boolean success, List<FSAError> errors, FiniteStateAutomata automata, boolean complete) {
+	public FSABuildResult(boolean success, List<FSAError> errors, FiniteStateAutomata automata) {
 		this.errors = errors;
 		this.success = success;
 		this.automata = automata;
-		this.complete = complete;
 	}
 
 	public FSABuildResult(FSAError error) {
@@ -31,10 +34,6 @@ public class FSABuildResult {
 
 	public boolean successful() {
 		return success;
-	}
-
-	public boolean isComplete() {
-		return complete;
 	}
 
 	public List<FSAError> getErrors() {

@@ -1,3 +1,5 @@
+package FSATools.Foundation;
+
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -6,13 +8,15 @@ public class FiniteStateAutomata {
 	private Collection<String> alphabet;
 	private FSAState initialState;
 	private Collection<FSAState> finalStates;
+	private boolean complete;
 
 	private boolean finalStatesCollected;
 
-	public FiniteStateAutomata(Collection<FSAState> states, Collection<String> alphabet, FSAState initialState) {
+	public FiniteStateAutomata(Collection<FSAState> states, Collection<String> alphabet, FSAState initialState, boolean complete) {
 		this.states = states;
 		this.alphabet = alphabet;
 		this.initialState = initialState;
+		this.complete = complete;
 
 		finalStatesCollected = false;
 	}
@@ -27,6 +31,10 @@ public class FiniteStateAutomata {
 
 	public FSAState getInitialState() {
 		return initialState;
+	}
+
+	public boolean isComplete() {
+		return complete;
 	}
 
 	public Collection<FSAState> getFinalStates() {

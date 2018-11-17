@@ -1,3 +1,8 @@
+package FSATools.Regex;
+
+import FSATools.Foundation.FSAState;
+import FSATools.Foundation.FiniteStateAutomata;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

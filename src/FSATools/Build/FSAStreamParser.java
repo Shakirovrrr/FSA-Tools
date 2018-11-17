@@ -1,3 +1,5 @@
+package FSATools.Build;
+
 import java.io.InputStream;
 import java.util.Scanner;
 
@@ -26,7 +28,7 @@ public class FSAStreamParser {
 
 	public boolean parse() {
 		if (!readComplete) {
-			throw new IllegalStateException("Wile was not read yet.");
+			throw new IllegalStateException("File was not read yet.");
 		}
 
 		/* Use exception catching
@@ -39,25 +41,44 @@ public class FSAStreamParser {
 			parseTransitions(trans);
 		} catch (MalformedInputException e) {
 			builder.invalidateInputFile();
+			return false;
 		}
 
 		parseComplete = true;
 
-		return parseComplete;
+		return true;
 	}
 
 	public boolean read() {
 		Scanner scanner = new Scanner(stream);
+		if (!scanner.hasNextLine()) {
+			return false;
+		}
 		states = scanner.nextLine();
+
+		if (!scanner.hasNextLine()) {
+			return false;
+		}
 		alphabet = scanner.nextLine();
+
+		if (!scanner.hasNextLine()) {
+			return false;
+		}
 		initSt = scanner.nextLine();
+
+		if (!scanner.hasNextLine()) {
+			return false;
+		}
 		finSt = scanner.nextLine();
+
+		if (!scanner.hasNextLine()) {
+			return false;
+		}
 		trans = scanner.nextLine();
-		scanner.close();
 
 		readComplete = true;
 
-		return readComplete;
+		return true;
 	}
 
 	private void parseStates(String states) throws MalformedInputException {

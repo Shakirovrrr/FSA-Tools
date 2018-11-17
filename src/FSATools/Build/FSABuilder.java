@@ -1,3 +1,8 @@
+package FSATools.Build;
+
+import FSATools.Foundation.FSAState;
+import FSATools.Foundation.FiniteStateAutomata;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -78,18 +83,17 @@ public class FSABuilder {
 		}
 
 		// Check for E2 and W2
-		try {
-			checkInitialSpan();
-		} catch (FSAException e) {
-			return new FSABuildResult(e.reason);
+		boolean statesConnected = checkInitialSpan();
+		if (!statesConnected) {
+			return new FSABuildResult(FSABuildResult.FSAError.E2);
 		}
 
 		// Check completeness
 		boolean complete = checkCompleteness();
 
 		FiniteStateAutomata automata =
-				new FiniteStateAutomata(compiled, alphabet, stateCache.get(initialState));
-		return new FSABuildResult(true, warnings, automata, complete);
+				new FiniteStateAutomata(compiled, alphabet, stateCache.get(initialState), complete);
+		return new FSABuildResult(true, warnings, automata);
 	}
 
 	private LinkedList<FSAState> compileTransitions() throws FSAException {
@@ -147,11 +151,11 @@ public class FSABuilder {
 		}
 	}
 
-	private void checkInitialSpan() throws FSAException {
+	private boolean checkInitialSpan() {
 		HashSet<FSAState> spanSet = buildSpanSet();
 
 		if (spanSet.size() == states.size()) {
-			return;
+			return true;
 		}
 
 		warnings.add(FSABuildResult.FSAError.W2);
@@ -159,9 +163,8 @@ public class FSABuilder {
 		HashSet<FSAState> outsiders = findOutsiders(spanSet);
 
 		rescueOutsiders(outsiders, spanSet);
-		if (outsiders.size() > 0) {
-			throw new FSAException(FSABuildResult.FSAError.E2);
-		}
+
+		return outsiders.size() == 0;
 	}
 
 	private HashSet<FSAState> buildSpanSet() {

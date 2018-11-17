@@ -1,3 +1,5 @@
+package FSATools.Foundation;
+
 import java.util.Map;
 
 public class FSAState {
