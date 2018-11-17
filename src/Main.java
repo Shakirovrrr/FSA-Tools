@@ -52,18 +52,4 @@ public class Main {
 				break;
 		}
 	}
-
-	private static void printWarnings(Collection<FSABuildResult.FSAError> warnings, PrintStream printer) {
-		printer.print("\nWarning:");
-		for (FSABuildResult.FSAError warning : warnings) {
-			switch (warning) {
-				case W1:
-					printer.print("\nW1: Accepting state is not defined");
-					break;
-				case W2:
-					printer.print("\nW2: Some states are not reachable from initial state");
-					break;
-			}
-		}
-	}
 }
