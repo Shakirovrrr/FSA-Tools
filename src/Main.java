@@ -48,7 +48,7 @@ public class Main {
 				printer.print("E5: Input file is malformed");
 				break;
 			case W3:
-				printer.print("\nE6: FSA is nondeterministic");
+				printer.print("E6: FSA is nondeterministic");
 				break;
 		}
 	}

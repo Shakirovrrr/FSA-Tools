@@ -1,26 +1,34 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class FSARegexMaker {
 	private FiniteStateAutomata automata;
 	private List<FSAState> states;
+	private boolean finalStateDefined;
 
 	public FSARegexMaker(FiniteStateAutomata automata) {
 		this.automata = automata;
 		this.states = new ArrayList<>(automata.getStates());
-	}
 
-	public String makeRegex() {
-		int k = states.size();
-		int i = 0, j = states.size();
-		StringBuilder rule = updateRule(k, i, j);
-
-		return rule.toString();
+		finalStateDefined = !automata.getFinalStates().isEmpty();
 	}
 
 	public static String makeRegex(FiniteStateAutomata automata) {
 		FSARegexMaker maker = new FSARegexMaker(automata);
 		return maker.makeRegex();
+	}
+
+	public String makeRegex() {
+		if (!finalStateDefined) {
+			return "{}";
+		}
+
+		int k = states.size() - 1;
+		int i = 0, j = states.size() - 1;
+		StringBuilder rule = updateRule(k, i, j);
+
+		return rule.toString();
 	}
 
 	private StringBuilder updateRule(int k, int i, int j) {
@@ -42,7 +50,30 @@ public class FSARegexMaker {
 	private StringBuilder initialUpdateRule(int i, int j) {
 		StringBuilder builder = new StringBuilder();
 
+		FSAState iState = states.get(i);
+		FSAState jState = states.get(j);
 
+		for (Map.Entry<String, FSAState> entry : iState.getTransitions().entrySet()) {
+			if (entry.getValue().equals(jState)) {
+				builder.append(entry.getKey());
+				builder.append('|');
+			}
+		}
+		if (builder.length() > 0) {
+			builder.deleteCharAt(builder.length() - 1);
+		}
+
+		if (i == j) {
+			if (builder.length() > 0) {
+				builder.append("|eps");
+			} else {
+				builder.append("eps");
+			}
+		}
+
+		if (builder.length() == 0) {
+			builder.append("{}");
+		}
 
 		return builder;
 	}
