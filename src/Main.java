@@ -16,7 +16,6 @@ public class Main {
 		FiniteStateAutomata automata = null;
 		if (parser.read()) {
 			if (parser.parse()) {
-				inputStream.close();
 				builder = parser.constructBuilder();
 
 				FSABuildResult buildResult = builder.build();
