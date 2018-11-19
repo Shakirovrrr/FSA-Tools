@@ -3,15 +3,13 @@ import java.util.List;
 import java.util.Map;
 
 public class FSARegexMaker {
-	private FiniteStateAutomata automata;
-	private List<FSAState> states;
-	private boolean finalStateDefined;
+	private List<FSAState> states, finalStates;
+	private FSAState initialState;
 
 	public FSARegexMaker(FiniteStateAutomata automata) {
-		this.automata = automata;
 		this.states = new ArrayList<>(automata.getStates());
-
-		finalStateDefined = !automata.getFinalStates().isEmpty();
+		this.initialState = automata.getInitialState();
+		this.finalStates = new ArrayList<>(automata.getFinalStates());
 	}
 
 	public static String makeRegex(FiniteStateAutomata automata) {
@@ -20,12 +18,13 @@ public class FSARegexMaker {
 	}
 
 	public String makeRegex() {
-		if (!finalStateDefined) {
+		if (finalStates.isEmpty()) {
 			return "{}";
 		}
 
 		int k = states.size() - 1;
-		int i = 0, j = states.size() - 1;
+		int i = states.indexOf(initialState);
+		int j = states.indexOf(finalStates.get(0));
 		StringBuilder rule = updateRule(k, i, j);
 
 		return rule.toString();
