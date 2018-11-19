@@ -11,6 +11,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		FileInputStream inputStream = new FileInputStream("fsa.txt");
 		FSAStreamParser parser = new FSAStreamParser(inputStream);
+		inputStream.close();
 		FSABuilder builder;
 		FiniteStateAutomata automata = null;
 		if (parser.read()) {
