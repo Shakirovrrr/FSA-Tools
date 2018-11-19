@@ -24,4 +24,24 @@ public class FSAState {
 	public boolean isFinal() {
 		return isFinal;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(name);
+		builder.append(": ");
+		builder.append(isFinal ? "FINAL" : "NOT FINAL");
+		builder.append(", TRANSITIONS: [");
+		for (Map.Entry<String, FSAState> entry : transitions.entrySet()) {
+			builder.append(entry.getKey());
+			builder.append("->");
+			builder.append(entry.getValue().getName());
+			builder.append(", ");
+		}
+		builder.deleteCharAt(builder.length() - 1);
+		builder.deleteCharAt(builder.length() - 1);
+		builder.append(']');
+
+		return builder.toString();
+	}
 }
