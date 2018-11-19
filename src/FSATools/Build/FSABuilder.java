@@ -3,10 +3,7 @@ package FSATools.Build;
 import FSATools.Foundation.FSAState;
 import FSATools.Foundation.FiniteStateAutomata;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class FSABuilder {
 	private List<String> states, alphabet;
@@ -17,7 +14,7 @@ public class FSABuilder {
 	private boolean malformedInput;
 
 	private List<FSABuildResult.FSAError> warnings;
-	private HashMap<String, FSAState> stateCache;
+	private TreeMap<String, FSAState> stateCache;
 
 	public FSABuilder() {
 		states = new LinkedList<>();
@@ -97,7 +94,7 @@ public class FSABuilder {
 	}
 
 	private LinkedList<FSAState> compileTransitions() throws FSAException {
-		stateCache = new HashMap<>();
+		stateCache = new TreeMap<>();
 
 		for (Transition transition : transitions) {
 			// Check for E1
