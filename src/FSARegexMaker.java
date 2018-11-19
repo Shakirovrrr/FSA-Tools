@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +11,7 @@ public class FSARegexMaker {
 		this.states = new ArrayList<>(automata.getStates());
 		this.initialState = automata.getInitialState();
 		this.finalStates = new ArrayList<>(automata.getFinalStates());
+		this.finalStates.sort(Comparator.comparing(FSAState::getName));
 	}
 
 	public static String makeRegex(FiniteStateAutomata automata) {
@@ -24,8 +26,13 @@ public class FSARegexMaker {
 
 		int k = states.size() - 1;
 		int i = states.indexOf(initialState);
-		int j = states.indexOf(finalStates.get(0));
-		StringBuilder rule = updateRule(k, i, j);
+		StringBuilder rule = new StringBuilder();
+		for (FSAState state : finalStates) {
+			int j = states.indexOf(state);
+			rule.append(updateRule(k, i, j));
+			rule.append('|');
+		}
+		rule.deleteCharAt(rule.length() - 1);
 
 		return rule.toString();
 	}
@@ -58,7 +65,7 @@ public class FSARegexMaker {
 				builder.append('|');
 			}
 		}
-		if (builder.length() > 0) {
+		if (builder.length() > 0 && builder.charAt(builder.length() - 1) == '|') {
 			builder.deleteCharAt(builder.length() - 1);
 		}
 
