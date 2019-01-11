@@ -9,9 +9,8 @@ import java.io.IOException;
 
 public class Main {
 	public static void main(String[] args) throws IOException {
-		FileInputStream inputStream = new FileInputStream("onoff.fsa");
+		FileInputStream inputStream = new FileInputStream("fsa.txt");
 		FSAStreamParser parser = new FSAStreamParser(inputStream);
-		inputStream.close();
 		FSABuilder builder;
 		FiniteStateAutomata automata = null;
 		if (parser.read()) {
@@ -31,6 +30,8 @@ public class Main {
 
 		if (automata != null) {
 			System.out.println(FSARegexMaker.makeRegex(automata));
+			String[] test = {"turn_off", "turn_off", "turn_on"};
+			System.out.println(automata.compute(test));
 		}
 	}
 }

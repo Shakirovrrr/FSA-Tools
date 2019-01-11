@@ -45,7 +45,26 @@ public class FiniteStateAutomata {
 		return finalStates;
 	}
 
-	public void compile() {
+	public boolean compute(String[] word) {
+		FSAState current = initialState;
+
+		for (String token : word) {
+			if (current == null) {
+				return false;
+			}
+
+			current = nextState(current, token);
+		}
+
+		return finalStates.contains(current);
+	}
+
+	private FSAState nextState(FSAState currentState, String token) {
+		if (!currentState.getTransitions().containsKey(token)) {
+			return null;
+		}
+
+		return currentState.getTransitions().get(token);
 	}
 
 	private void collectFinalStates() {
