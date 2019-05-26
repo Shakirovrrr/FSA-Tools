@@ -26,13 +26,22 @@ public class FSAStreamParser {
 		return builder;
 	}
 
-	public boolean parse() {
+	public boolean readDone() {
+		return readComplete;
+	}
+
+	public boolean parseDone() {
+		return parseComplete;
+	}
+
+	public void parse() {
 		if (!readComplete) {
 			throw new IllegalStateException("File was not read yet.");
 		}
 
 		/* Use exception catching
 		to stop further parsing */
+		// TODO Replace exception catching with function returns
 		try {
 			parseStates(states);
 			parseAlphabet(alphabet);
@@ -41,44 +50,39 @@ public class FSAStreamParser {
 			parseTransitions(trans);
 		} catch (MalformedInputException e) {
 			builder.invalidateInputFile();
-			return false;
 		}
 
 		parseComplete = true;
-
-		return true;
 	}
 
-	public boolean read() {
+	public void read() {
 		Scanner scanner = new Scanner(stream);
 		if (!scanner.hasNextLine()) {
-			return false;
+			return;
 		}
 		states = scanner.nextLine();
 
 		if (!scanner.hasNextLine()) {
-			return false;
+			return;
 		}
 		alphabet = scanner.nextLine();
 
 		if (!scanner.hasNextLine()) {
-			return false;
+			return;
 		}
 		initSt = scanner.nextLine();
 
 		if (!scanner.hasNextLine()) {
-			return false;
+			return;
 		}
 		finSt = scanner.nextLine();
 
 		if (!scanner.hasNextLine()) {
-			return false;
+			return;
 		}
 		trans = scanner.nextLine();
 
 		readComplete = true;
-
-		return true;
 	}
 
 	private void parseStates(String states) throws MalformedInputException {
@@ -135,6 +139,7 @@ public class FSAStreamParser {
 
 	private class MalformedInputException extends Exception {
 		MalformedInputException() {
+			// TODO More exception constructors
 		}
 	}
 }

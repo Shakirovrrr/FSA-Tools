@@ -14,8 +14,11 @@ public class Main {
 		inputStream.close();
 		FSABuilder builder;
 		FiniteStateAutomata automata = null;
-		if (parser.read()) {
-			if (parser.parse()) {
+
+		parser.read();
+		if (parser.readDone()) {
+			parser.parse();
+			if (parser.parseDone()) {
 				builder = parser.constructBuilder();
 
 				FSABuildResult buildResult = builder.build();
